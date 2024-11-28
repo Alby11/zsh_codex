@@ -17,7 +17,6 @@ class BaseClient(ABC):
     def get_completion(self, full_command: str) -> str:
         pass
 
-
 class OpenAIClient(BaseClient):
     """
     config keys:
@@ -42,6 +41,9 @@ class OpenAIClient(BaseClient):
             sys.exit(1)
 
         self.config = config
+        self.config["api_key"] = os.getenv("OPENAI_API_KEY", self.config.get("api_key"))
+        if not self.config["api_key"]:
+            raise ValueError("API key must be provided either via environment variable or config file.")
         self.config["model"] = self.config.get("model", self.default_model)
         self.client = OpenAI(
             api_key=self.config["api_key"],
